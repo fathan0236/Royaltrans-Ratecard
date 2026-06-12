@@ -1,0 +1,407 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Royaltrans Shuttle — Rate Card Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#204899;--red:#FF275B;--gold:#FFBF00;--blue:#2E81C3;--lblue:#DCEAF6;--lgold:#FFF3CC;--ink:#1c2434;--line:#cdd9ea;--bg:#eef3f9;}
+*{box-sizing:border-box}
+body{margin:0;font-family:'PT Sans',system-ui,Segoe UI,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:88px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+.n{font-variant-numeric:tabular-nums;text-align:right}
+header{background:var(--navy);color:#fff;padding:18px 0 16px}
+header h1{margin:0;font-size:20px;letter-spacing:.2px}
+header p{margin:5px 0 0;font-size:13px;color:#cfe0f5}
+main{padding-top:18px}
+h2{font-size:16px;color:var(--navy);margin:22px 0 10px}
+h3{font-size:12px;color:var(--navy);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.5px}
+.settings{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:16px}
+.settings>summary{cursor:pointer;padding:12px 16px;font-weight:700;color:var(--navy);list-style:none}
+.settings>summary::-webkit-details-marker{display:none}
+.setbody{padding:0 16px 16px;border-top:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:8px 12px}
+label{display:flex;flex-direction:column;font-size:11px;color:#5a6b85;gap:3px}
+input,select{font:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);width:100%}
+input:focus,select:focus{outline:2px solid var(--blue);outline-offset:-1px;border-color:var(--blue)}
+.chips{display:flex;flex-wrap:wrap;gap:8px 18px}
+.chk{flex-direction:row;align-items:center;font-size:13px;color:var(--ink);gap:6px}
+.chk input{width:auto}
+.route{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.route>summary{cursor:pointer;padding:12px 16px;display:flex;align-items:center;gap:12px;list-style:none}
+.route>summary::-webkit-details-marker{display:none}
+.route>summary::before{content:'\25B8';color:var(--blue);font-size:12px}
+.route[open]>summary::before{content:'\25BE'}
+.rname{font-weight:700;color:var(--navy);font-size:15px}
+.meta{font-size:12px;color:#5a6b85}
+.tar{margin-left:auto;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;background:var(--lgold);padding:4px 10px;border-radius:6px;white-space:nowrap}
+.rbody{padding:0 16px 16px;border-top:1px solid var(--line)}
+.params{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;margin:14px 0}
+table.legs{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px}
+table.legs th{background:var(--lblue);color:var(--navy);padding:6px;text-align:left;font-weight:700;white-space:nowrap}
+table.legs td{padding:3px;border-bottom:1px solid #eef2f7}
+table.legs td input,table.legs td select{padding:5px 6px}
+.rowact{width:36px;text-align:center}
+table.legs td.grip,table.legs th.grip{width:24px;text-align:center;color:#9fb0c8;cursor:grab;font-weight:700;letter-spacing:-2px;user-select:none;-webkit-user-select:none;touch-action:none}
+table.legs td.grip:active{cursor:grabbing;color:var(--navy)}
+table.legs tr.dragging{background:var(--lgold);box-shadow:0 6px 16px rgba(32,72,153,.18);outline:1px solid #FFBF00}
+button{font:inherit;cursor:pointer;border:none;border-radius:7px;padding:8px 14px;font-size:13px;font-weight:700;background:var(--navy);color:#fff}
+button:hover{filter:brightness(1.08)}
+.ghost{background:var(--lblue);color:var(--navy)}
+.danger{background:#fff;color:var(--red);border:1px solid var(--red)}
+.x{background:none;color:#b34;padding:4px 8px;font-size:14px}
+.rbtns{display:flex;gap:10px;margin-bottom:14px}
+.add{display:block;width:100%;background:var(--lblue);color:var(--navy);border:1px dashed var(--blue);padding:12px;margin-bottom:8px}
+.outgrid{display:grid;grid-template-columns:.9fr 1.1fr 1.35fr;gap:14px;background:#f7fafd;border:1px solid var(--line);border-radius:8px;padding:12px;margin-top:6px}
+.vol{font-size:12px;line-height:1.7}
+.vol b{display:block;color:var(--navy);margin-bottom:4px}
+.vol .n{display:inline-block}
+table.cost,table.price{width:100%;border-collapse:collapse;font-size:12px}
+table.cost td,table.price td{padding:3px 4px;border-bottom:1px solid #eef2f7}
+.cost .muted{color:#aab;text-decoration:line-through}
+.tot td{font-weight:700;border-top:2px solid var(--navy);border-bottom:none;color:var(--navy)}
+.gold td{background:var(--gold);font-weight:700;color:var(--navy)}
+.neg td{color:var(--red);font-weight:700}
+.pos td{color:#1a7f4b;font-weight:700}
+.warn{margin-top:8px;background:#fff0f3;border:1px solid var(--red);color:var(--red);padding:8px 10px;border-radius:6px;font-size:12px}
+.sumsec{margin-top:8px}
+.tablewrap{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:10px}
+table.summary{width:100%;border-collapse:collapse;font-size:13px;min-width:900px}
+table.summary th{background:var(--navy);color:#fff;padding:9px 10px;text-align:right;font-weight:700;white-space:nowrap}
+table.summary th:first-child{text-align:left}
+table.summary td{padding:8px 10px;border-bottom:1px solid #eef2f7}
+table.summary td:first-child{text-align:left;font-weight:700;color:var(--navy)}
+table.summary tfoot td{background:var(--lblue);font-weight:700;color:var(--navy);border-top:2px solid var(--navy)}
+.strong{font-weight:700;color:var(--navy)}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--navy);color:#fff;box-shadow:0 -3px 14px rgba(0,0,0,.18);z-index:50}
+.barin{display:flex;align-items:center;justify-content:space-between;padding:11px 0}
+.barlbl{font-size:12px;color:#cfe0f5;margin-right:10px}
+.gtval{font-size:20px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.gtmeta{font-size:12px;color:#cfe0f5;margin-left:12px}
+.barbtns{display:flex;gap:10px}
+.bar button{background:var(--gold);color:var(--navy)}
+.bar #print{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)}
+@media(max-width:760px){.outgrid{grid-template-columns:1fr}.params{grid-template-columns:1fr 1fr}.gtval{font-size:17px}}
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}header p,.settings,.rbtns,.modebar,.barbtns,.add,.x,.rowact,.grip,#addRoute,.shiftpre{display:none!important}.route>summary::before{display:none}body{padding:0;background:#fff}.bar{position:static;box-shadow:none;border-top:2px solid #204899}.route,.tablewrap{border:1px solid #e3e9f2}input,select{border:none!important;background:transparent!important;-webkit-appearance:none;appearance:none;padding:0!important;color:#000;font:inherit;text-align:inherit}.route,.outgrid,table,tr,.vol,details{break-inside:avoid}thead{display:table-header-group}@page{margin:14mm}h1{font-size:20px}}
+.modebar{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:13px;color:#5a6b85;flex-wrap:wrap}
+.seg{background:#fff;color:var(--navy);border:1px solid var(--line);padding:7px 14px}
+.seg.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.sp{margin-left:14px}
+.note{font-size:11px;color:#7a8aa3;flex-basis:100%;margin-top:2px}
+.overlay{position:fixed;inset:0;background:rgba(20,30,55,.55);display:flex;align-items:center;justify-content:center;z-index:200;padding:18px}
+.modal{background:#fff;border-radius:14px;max-width:460px;width:100%;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.modal h2{margin:0 0 4px;color:var(--navy);font-size:18px}.modal .sub{margin:0 0 18px;font-size:13px;color:#5a6b85}
+.q{margin-bottom:16px}.q>label{font-size:13px;font-weight:700;color:var(--ink);display:block;margin-bottom:7px}
+.opts{display:flex;gap:8px}
+.opt{flex:1;background:#fff;color:var(--navy);border:1px solid var(--line);padding:11px;border-radius:8px;font-weight:700;font:inherit;cursor:pointer}
+.opt.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.start{width:100%;margin-top:6px;padding:12px;background:var(--gold);color:var(--navy);font-size:14px}
+.shiftpre{font-size:12px;color:#5a6b85;margin:8px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg2{background:var(--lblue);color:var(--navy);border:1px solid var(--line);padding:6px 12px;border-radius:7px;font:inherit;font-weight:700;font-size:12px;cursor:pointer}
+.seg2:hover{filter:brightness(1.05)}
+.pramout{margin-top:6px}
+.pcard{display:flex;flex-wrap:wrap;gap:8px 18px;background:var(--lgold);border:1px solid #f0d98a;border-radius:8px;padding:10px 12px;font-size:12px;color:var(--ink)}
+.pcard b{color:var(--navy)}.pcard .gv{font-size:14px}.pcard .note2{flex-basis:100%;color:#7a8aa3;font-size:11px}
+</style></head><body>
+<div class="overlay" id="setup"><div class="modal">
+<h2>Atur tampilan rate card</h2>
+<p class="sub">Pilih dulu cara hitung &amp; satuan tarif. Bisa diubah kapan saja lewat tombol di atas.</p>
+<div class="q"><label>1. Hitungan per?</label><div class="opts">
+<button class="opt active" data-q="mode" data-v="hari">Per Hari</button>
+<button class="opt" data-q="mode" data-v="bulan">Per Bulan</button></div></div>
+<div class="q"><label>2. Tarif ditampilkan per?</label><div class="opts">
+<button class="opt active" data-q="unit" data-v="bus">Per Bus</button>
+<button class="opt" data-q="unit" data-v="orang">Per Orang</button></div></div>
+<button id="startBtn" class="start">Mulai</button>
+</div></div>
+<header><div class="wrap"><h1>Royaltrans Shuttle &mdash; Rate Card Generator</h1>
+<p>Hitung tarif corporate shuttle per rute secara langsung. Ubah titik/leg, hari, dan margin &mdash; angka ter-update otomatis. Ekspor ke CSV/PDF untuk dokumen bid yang auditable.</p></div></header>
+<main class="wrap">
+<details class="settings" id="settings"><summary>&#9881; Asumsi &amp; Pengaturan (klik untuk buka)</summary>
+<div class="setbody">
+<h3>Konstanta biaya</h3><div class="grid" id="consts"></div>
+<h3>Komponen biaya yang disertakan</h3><div class="chips" id="toggles"></div>
+<h3>Biaya Pramudi</h3>
+<div class="modebar" style="margin-bottom:6px"><span>Metode:</span>
+<button class="seg pmb" data-pm="biasa">Biasa (gaji bulanan &divide; hari)</button>
+<button class="seg pmb" data-pm="lembur">Lembur (Komp Gaji, per jam)</button></div>
+<div id="biasaWrap"><div class="grid" id="biasaGrid"></div></div>
+<div id="lemburWrap"><div class="grid" id="lemburGrid"></div>
+<div class="shiftpre">Preset shift pramudi:
+<button class="seg2" data-shift="full">Full 14 Jam</button>
+<button class="seg2" data-shift="pagi">Pagi</button>
+<button class="seg2" data-shift="sore">Sore</button></div></div>
+<div class="pramout" id="pramout"></div>
+</div></details>
+<div class="modebar">
+<span>Basis:</span><button class="seg modeb active" data-mode="hari">Per Hari</button><button class="seg modeb" data-mode="bulan">Per Bulan</button>
+<span class="sp">Satuan:</span><button class="seg unitb active" data-unit="bus">Per Bus</button><button class="seg unitb" data-unit="orang">Per Orang</button>
+<span class="note">Tarif/hari = tarif bulan (stlh PPN 11%) &divide; hari, dibulatkan &uarr;Rp100.000 (unit resmi bid BPJS). Per orang = tarif per bus &divide; kapasitas.</span>
+</div>
+<div id="routes"></div>
+<button id="addRoute" class="add">+ Tambah Rute</button>
+<section class="sumsec"><h2>Ringkasan Bid</h2>
+<div class="tablewrap"><table class="summary">
+<thead id="sumhead"></thead>
+<tbody id="sumbody"></tbody><tfoot><tr id="sumtot"></tr></tfoot></table></div>
+</section>
+</main>
+<div class="bar"><div class="wrap barin">
+<div><span class="barlbl" id="gtlbl">Grand Total /hari</span><span class="gtval" id="gtval"></span><span class="gtmeta" id="gtmeta"></span></div>
+<div class="barbtns"><button id="xlsx">Export Excel</button><button id="csv">Export CSV</button><button id="print">Cetak / PDF</button></div>
+</div></div>
+<script>
+const A={"solar": 6800, "eff": 3, "srvKm": 1630, "tkoP": 20125, "tkoK": 7500, "f1": 1.1, "f2": 1.2, "brandYr": 18000000, "cuciDay": 35739, "izinYr": 1462600, "ppn": 0.11, "kapasitas": 30, "penyusutan": 8427233.76, "pramudiMode": "biasa", "pk1": 2, "pk2": 3, "pk3": 4, "jamMulai": "04:00", "jamBerakhir": "18:00", "istirahat": 3, "biayaPramudi": 5396791, "tunjangan": 1349198, "basisHari": 22, "upahJam": 35432.81}, INC={"bbm": true, "tol": true, "srv": true, "prm": true, "tko": true, "brand": true, "cuci": true, "izin": true, "peny": false};
+let ROUTES=[{"name": "Rute 1", "bus": 1, "hari": 22, "margin": 10, "legs": [{"segmen": "Depo Cawang → Titik Awal (Pagi)", "jenis": "Kosong", "km": 39, "waktu": 50, "tol": 34000, "freq": 1}, {"segmen": "Titik Awal → A", "jenis": "Produksi", "km": 45.6, "waktu": 100, "tol": 19500, "freq": 1}, {"segmen": "A → B", "jenis": "Produksi", "km": 5.2, "waktu": 15, "tol": 0, "freq": 1}, {"segmen": "Depo Cawang → Titik Awal (Sore)", "jenis": "Kosong", "km": 12, "waktu": 35, "tol": 11000, "freq": 1}, {"segmen": "Titik Awal Sore → A", "jenis": "Produksi", "km": 42.3, "waktu": 110, "tol": 19500, "freq": 1}, {"segmen": "A → Depo Cawang", "jenis": "Kosong", "km": 37, "waktu": 60, "tol": 34000, "freq": 1}]}];
+let MODE='hari', UNIT='bus';
+
+function roundUp(x,m){return Math.ceil(x/m)*m;}
+function hm(s){if(typeof s==='number')return s;if(!s)return 0;const p=String(s).split(':');return (+p[0]||0)+((+p[1]||0)/60);}
+function lemburBands(A){let H=hm(A.jamBerakhir)-hm(A.jamMulai);if(H<0)H+=24;H-=(+A.istirahat||0);if(H<0)H=0;return{H:H,b1:Math.min(H,7),b2:Math.max(0,Math.min(H,8)-7),b3:Math.max(0,H-8)};}
+function lemburHarian(A){const b=lemburBands(A);return (b.b1*(+A.pk1||0)+b.b2*(+A.pk2||0)+b.b3*(+A.pk3||0))*(+A.upahJam||0);}
+function pramudiBln(A,hari){
+  if(A.pramudiMode==='lembur'){return lemburHarian(A)*hari;}
+  const total=(+A.biayaPramudi||0)+(+A.tunjangan||0);
+  return A.basisHari?(total/A.basisHari)*hari:0;
+}
+function compute(r,A,INC){
+  let kmDay=0,prodMin=0,kosMin=0,tolDay=0;
+  for(const l of r.legs){const km=+l.km||0,w=+l.waktu||0,t=+l.tol||0,f=+l.freq||0;kmDay+=km*f;tolDay+=t*f;if(l.jenis==='Produksi')prodMin+=w*f;else if(l.jenis==='Kosong')kosMin+=w*f;}
+  const hari=+r.hari||0,bus=+r.bus||0,margin=(+r.margin||0)/100;
+  const kmMonth=kmDay*hari,jamProd=Math.ceil(prodMin*hari/60),jamKosong=kosMin*hari/60,tolMonth=tolDay*hari;
+  const bbm=INC.bbm?roundUp((A.solar/A.eff)*kmMonth,1e5):0;
+  const tol=INC.tol?tolMonth:0;
+  const srv=INC.srv?A.srvKm*kmMonth:0;
+  const prm=INC.prm?pramudiBln(A,hari):0;
+  const tko=INC.tko?(jamProd*A.tkoP+jamKosong*A.tkoK)*A.f1*A.f2:0;
+  const brand=INC.brand?A.brandYr/12:0;
+  const cuci=INC.cuci?A.cuciDay*hari:0;
+  const izin=INC.izin?A.izinYr/12:0;
+  const peny=INC.peny?(+A.penyusutan||0):0;
+  const opsTotal=bbm+tol+srv+prm+tko+brand+cuci+izin;
+  const total=opsTotal+peny;
+  const laba=total*margin,before=total+laba,ppn=before*A.ppn,after=before+ppn;
+  const hariBefore=hari?roundUp(before/hari,1e5):0,hariAfter=hari?roundUp(after/hari,1e5):0;
+  const perOrang=A.kapasitas?after/A.kapasitas:0;
+  const ekonomi=opsTotal+(+A.penyusutan||0),marginRiil=ekonomi?(before-ekonomi)/ekonomi:0;
+  return {kmMonth,jamProd,jamKosong,tolMonth,bbm,tol,srv,prm,tko,brand,cuci,izin,peny,opsTotal,total,laba,before,ppn,after,hariBefore,hariAfter,perOrang,ekonomi,marginRiil,armadaAfter:after*bus,bus,hari};
+}
+
+function colName(n){let s='';while(n>0){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=(n-m-1)/26;}return s;}
+function xesc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+const STYLES='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="&quot;Rp&quot;#,##0"/></numFmts><fonts count="5"><font><sz val="10"/><name val="Arial"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><b/><sz val="14"/><color rgb="FF204899"/><name val="Arial"/></font><font><b/><sz val="10"/><name val="Arial"/></font><font><i/><sz val="9"/><color rgb="FF5A6B85"/><name val="Arial"/></font></fonts><fills count="5"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF204899"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFFBF00"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFDCEAF6"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFBFBFBF"/></left><right style="thin"><color rgb="FFBFBFBF"/></right><top style="thin"><color rgb="FFBFBFBF"/></top><bottom style="thin"><color rgb="FFBFBFBF"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="9"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center"/></xf><xf fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center"/></xf><xf fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf><xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf><xf fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf fontId="3" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf><xf numFmtId="164" fontId="3" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+function sheetXML(rows,cols,merges,freeze){let body='';rows.forEach((row,ri)=>{let cells='';row.forEach((cell,ci)=>{const ref=colName(ci+1)+(ri+1);let v=cell,s=null;if(cell&&typeof cell==='object'){v=cell.v;s=cell.s;}const sa=(s!=null)?` s="${s}"`:'';if(typeof v==='number'&&isFinite(v))cells+=`<c r="${ref}"${sa}><v>${v}</v></c>`;else cells+=`<c r="${ref}"${sa} t="inlineStr"><is><t xml:space="preserve">${xesc(v==null?'':v)}</t></is></c>`;});body+=`<row r="${ri+1}">${cells}</row>`;});const colsX=(cols&&cols.length)?'<cols>'+cols.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')+'</cols>':'';const mergeX=(merges&&merges.length)?'<mergeCells count="'+merges.length+'">'+merges.map(m=>`<mergeCell ref="${m}"/>`).join('')+'</mergeCells>':'';const viewX=freeze?`<sheetViews><sheetView workbookViewId="0"><pane ySplit="${freeze}" topLeftCell="A${freeze+1}" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>`:'';return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'+viewX+colsX+'<sheetData>'+body+'</sheetData>'+mergeX+'</worksheet>';}
+function crc32(b){let crc=0xFFFFFFFF;for(let i=0;i<b.length;i++){crc^=b[i];for(let k=0;k<8;k++)crc=crc&1?(crc>>>1)^0xEDB88320:crc>>>1;}return (crc^0xFFFFFFFF)>>>0;}
+function zipBytes(files){
+  const enc=new TextEncoder();
+  const u16=n=>[n&255,(n>>8)&255], u32=n=>[n&255,(n>>8)&255,(n>>16)&255,(n>>24)&255];
+  let chunks=[],central=[],offset=0;
+  for(const f of files){
+    const nameB=enc.encode(f.name), data=f.data, crc=crc32(data);
+    const local=[].concat([0x50,0x4b,0x03,0x04],u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(data.length),u32(data.length),u16(nameB.length),u16(0));
+    chunks.push(new Uint8Array(local),nameB,data);
+    const cd=[].concat([0x50,0x4b,0x01,0x02],u16(20),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(data.length),u32(data.length),u16(nameB.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset));
+    central.push(new Uint8Array(cd),nameB);
+    offset+=local.length+nameB.length+data.length;
+  }
+  let cdSize=0; central.forEach(c=>cdSize+=c.length);
+  const eocd=new Uint8Array([].concat([0x50,0x4b,0x05,0x06],u16(0),u16(0),u16(files.length),u16(files.length),u32(cdSize),u32(offset),u16(0)));
+  const parts=chunks.concat(central,[eocd]);
+  let len=0; parts.forEach(p=>len+=p.length);
+  const out=new Uint8Array(len); let pos=0; for(const p of parts){out.set(p,pos);pos+=p.length;}
+  return out;
+}
+function xlsxBytes(sheets){const enc=new TextEncoder();const F=(n,s)=>({name:n,data:enc.encode(s)});const n=sheets.length;let ctOver='',wbSheets='',wbRels='';sheets.forEach((sh,i)=>{const id=i+1;ctOver+=`<Override PartName="/xl/worksheets/sheet${id}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`;wbSheets+=`<sheet name="${xesc(sh.name)}" sheetId="${id}" r:id="rId${id}"/>`;wbRels+=`<Relationship Id="rId${id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${id}.xml"/>`;});wbRels+=`<Relationship Id="rId${n+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>`;const files=[F('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+ctOver+'</Types>'),F('_rels/.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'),F('xl/workbook.xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'+wbSheets+'</sheets></workbook>'),F('xl/_rels/workbook.xml.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+wbRels+'</Relationships>'),F('xl/styles.xml',STYLES)];sheets.forEach((sh,i)=>{files.push(F('xl/worksheets/sheet'+(i+1)+'.xml',sheetXML(sh.rows,sh.cols,sh.merges,sh.freeze)));});return zipBytes(files);}
+const fmt=n=>'Rp '+Math.round(n||0).toLocaleString('id-ID');
+const pct=x=>(x*100).toFixed(1)+'%';
+const num=v=>{const n=parseFloat(v);return isNaN(n)?0:n;};
+const pd=(x,h)=>h?x/h:0;
+function scalers(rt){const hari=+rt.hari||0,kap=+A.kapasitas||0;return{tS:MODE==='hari'?(hari?1/hari:0):1,uS:UNIT==='orang'?(kap?1/kap:0):1,hari,kap};}
+const JENIS=['Produksi','Kosong'];
+
+function legRow(r,i,l){
+  const opt=JENIS.map(j=>`<option ${j===l.jenis?'selected':''}>${j}</option>`).join('');
+  return `<tr data-leg="${i}">
+    <td class="grip" title="Tahan lalu geser untuk ubah urutan">&#8942;&#8942;</td>
+    <td><input data-r="${r}" data-leg="${i}" data-field="segmen" data-kind="leg" value="${(l.segmen||'').replace(/"/g,'&quot;')}"></td>
+    <td><select data-r="${r}" data-leg="${i}" data-field="jenis" data-kind="leg">${opt}</select></td>
+    <td><input type="number" step="0.1" class="n" data-r="${r}" data-leg="${i}" data-field="km" data-kind="leg" value="${l.km}"></td>
+    <td><input type="number" step="1" class="n" data-r="${r}" data-leg="${i}" data-field="waktu" data-kind="leg" value="${l.waktu}"></td>
+    <td><input type="number" step="500" class="n" data-r="${r}" data-leg="${i}" data-field="tol" data-kind="leg" value="${l.tol}"></td>
+    <td><input type="number" step="1" class="n" data-r="${r}" data-leg="${i}" data-field="freq" data-kind="leg" value="${l.freq}"></td>
+    <td class="rowact"><button class="x" data-action="delleg" data-r="${r}" data-leg="${i}" title="Hapus leg">&#10005;</button></td>
+  </tr>`;
+}
+function routeCard(r){
+  const rt=ROUTES[r];
+  const legs=rt.legs.map((l,i)=>legRow(r,i,l)).join('');
+  return `<details class="route" open>
+    <summary><span class="rname">${rt.name||'(tanpa nama)'}</span>
+      <span class="meta">${rt.bus} bus &middot; ${rt.hari} hari</span>
+      <span class="tar" id="tar_${r}"></span></summary>
+    <div class="rbody">
+      <div class="params">
+        <label>Nama Rute<input data-r="${r}" data-field="name" data-kind="route" value="${(rt.name||'').replace(/"/g,'&quot;')}"></label>
+        <label>Jumlah Bus<input type="number" min="1" step="1" class="n" data-r="${r}" data-field="bus" data-kind="route" value="${rt.bus}"></label>
+        <label>Hari Operasi/bln<input type="number" min="1" step="1" class="n" data-r="${r}" data-field="hari" data-kind="route" value="${rt.hari}"></label>
+        <label>Margin (%)<input type="number" step="1" class="n" data-r="${r}" data-field="margin" data-kind="route" value="${rt.margin}"></label>
+      </div>
+      <table class="legs"><thead><tr><th class="grip" title="Geser baris untuk ubah urutan"></th><th>Segmen (titik/leg)</th><th>Jenis</th><th>KM</th><th>Waktu (mnt)</th><th>Tol (Rp)</th><th>Trip/hari</th><th></th></tr></thead>
+      <tbody>${legs}</tbody></table>
+      <div class="rbtns"><button class="ghost" data-action="addleg" data-r="${r}">+ Tambah Leg</button>
+      <button class="danger" data-action="delroute" data-r="${r}">Hapus Rute</button></div>
+      <div class="out" id="out_${r}"></div>
+    </div></details>`;
+}
+function renderRoutes(){document.getElementById('routes').innerHTML=ROUTES.map((_,r)=>routeCard(r)).join('');}
+function cl(label,val,muted){return `<tr class="${muted?'muted':''}"><td>${label}</td><td class="n">${fmt(val)}</td></tr>`;}
+function routeOut(r){
+  const rt=ROUTES[r], c=compute(rt,A,INC);
+  const byH=MODE==='hari', byO=UNIT==='orang', s=scalers(rt), kap=s.kap;
+  const sc=x=>x*s.tS*s.uS, uLab=(byH?'hari':'bln')+(byO?'/org':'');
+  const headBus=byH?c.hariAfter:c.after, billed=byO?(kap?headBus/kap:0):headBus;
+  const cost=`${cl('BBM',sc(c.bbm),!INC.bbm)}${cl('Tol',sc(c.tol),!INC.tol)}${cl('Service Rutin',sc(c.srv),!INC.srv)}${cl('Pramudi',sc(c.prm),!INC.prm)}${cl('TKO',sc(c.tko),!INC.tko)}${cl('Branding',sc(c.brand),!INC.brand)}${cl('Cuci Bus',sc(c.cuci),!INC.cuci)}${cl('Perizinan',sc(c.izin),!INC.izin)}${cl(byH?'Penyusutan (÷30 hr)':'Penyusutan',(byH?c.peny/30:c.peny)*s.uS,!INC.peny)}<tr class="tot"><td>TOTAL BIAYA /${uLab}</td><td class="n">${fmt(sc(c.total))}</td></tr>`;
+  let price;
+  if(byH){
+    price=`<tr><td>Laba / Buffer (${rt.margin}%)</td><td class="n">${fmt(sc(c.laba))}</td></tr>
+      <tr><td>Tarif/${uLab} (sblm pajak)</td><td class="n">${fmt(sc(c.before))}</td></tr>
+      <tr><td>PPN 11%</td><td class="n">${fmt(sc(c.ppn))}</td></tr>
+      <tr><td>Tarif/${uLab} stlh pajak (eksak)</td><td class="n">${fmt(sc(c.after))}</td></tr>
+      <tr class="gold"><td>Tarif/${uLab} ditagih ${byO?'':'(bulat &uarr;100rb)'}</td><td class="n">${fmt(billed)}</td></tr>
+      ${byO?`<tr><td>&rarr; per bus/hari (bulat)</td><td class="n">${fmt(headBus)}</td></tr>`:`<tr><td>&rarr; per orang/hari (&divide;${kap})</td><td class="n">${fmt(kap?headBus/kap:0)}</td></tr>`}
+      <tr class="tot"><td>&times; ${c.bus} bus = kontrak/hari</td><td class="n">${fmt(headBus*c.bus)}</td></tr>`;
+  }else{
+    price=`<tr><td>Laba / Buffer (${rt.margin}%)</td><td class="n">${fmt(sc(c.laba))}</td></tr>
+      <tr><td>Tarif/${uLab} (sblm pajak)</td><td class="n">${fmt(sc(c.before))}</td></tr>
+      <tr><td>PPN 11%</td><td class="n">${fmt(sc(c.ppn))}</td></tr>
+      <tr class="gold"><td>Tarif/${uLab} (stlh pajak)</td><td class="n">${fmt(sc(c.after))}</td></tr>
+      ${byO?`<tr><td>&rarr; per bus/bln</td><td class="n">${fmt(c.after)}</td></tr>`:`<tr><td>&rarr; per orang/bln (&divide;${kap})</td><td class="n">${fmt(kap?c.after/kap:0)}</td></tr>`}
+      <tr><td>Tarif/hari per bus (ref, bulat)</td><td class="n">${fmt(c.hariAfter)}</td></tr>
+      <tr class="tot"><td>&times; ${c.bus} bus = kontrak/bln</td><td class="n">${fmt(c.after*c.bus)}</td></tr>`;
+  }
+  return `<div class="outgrid">
+    <div class="vol"><b>Volume / bln (basis)</b>
+      <div>KM: <span class="n">${Math.round(c.kmMonth).toLocaleString('id-ID')}</span></div>
+      <div>Jam Produksi: <span class="n">${c.jamProd}</span></div>
+      <div>Jam Kosong: <span class="n">${c.jamKosong.toFixed(1)}</span></div>
+      <div>Tol: <span class="n">${fmt(c.tolMonth)}</span></div></div>
+    <table class="cost"><tbody>${cost}</tbody></table>
+    <table class="price"><tbody>${price}</tbody></table>
+  </div>`;
+}
+function renderSummary(){
+  const byH=MODE==='hari',byO=UNIT==='orang',time=byH?'hari':'bln',uLab=time+(byO?'/org':'');
+  document.getElementById('sumhead').innerHTML=`<tr><th>Rute</th><th>Bus</th><th>Hari</th><th>Margin</th><th>Total Biaya/${uLab}</th><th>Tarif/${uLab} ${byH?'(bulat)':'(stlh pajak)'}</th><th>Total kontrak/${time}</th></tr>`;
+  let rows='',gk=0,gbus=0,gtot=0;
+  ROUTES.forEach(rt=>{const c=compute(rt,A,INC),s=scalers(rt),kap=s.kap;
+    const headBus=byH?c.hariAfter:c.after, tar=byO?(kap?headBus/kap:0):headBus, totB=c.total*s.tS*s.uS, kontrak=headBus*(+rt.bus||0);
+    gk+=kontrak; gbus+=(+rt.bus||0); gtot+=totB;
+    rows+=`<tr><td>${rt.name||'-'}</td><td class="n">${rt.bus}</td><td class="n">${rt.hari}</td><td class="n">${rt.margin}%</td><td class="n">${fmt(totB)}</td><td class="n">${fmt(tar)}</td><td class="n strong">${fmt(kontrak)}</td></tr>`;});
+  document.getElementById('sumbody').innerHTML=rows;
+  document.getElementById('sumtot').innerHTML=`<td>TOTAL (${ROUTES.length} rute)</td><td class="n">${gbus}</td><td></td><td></td><td class="n">${fmt(gtot)}</td><td></td><td class="n strong">${fmt(gk)}</td>`;
+  return {gk,gbus,time};
+}
+function updatePramOut(){
+  const el=document.getElementById('pramout'); if(!el)return;
+  if(A.pramudiMode==='lembur'){
+    const b=lemburBands(A), konv=b.b1*(+A.pk1||0)+b.b2*(+A.pk2||0)+b.b3*(+A.pk3||0), lh=lemburHarian(A), f1=n=>Number.isInteger(n)?n:(+n.toFixed(1));
+    el.innerHTML=`<div class="pcard"><span>Jam kerja: <b>${f1(b.H)} jam</b> (${A.jamMulai}&ndash;${A.jamBerakhir}${(+A.istirahat)?', istirahat '+A.istirahat+'j':''})</span><span>Band &times;2/&times;3/&times;4: <b>${f1(b.b1)} / ${f1(b.b2)} / ${f1(b.b3)} jam</b></span><span>Jam konversi: <b>${f1(konv)}</b></span><span>Lembur/hari: <b class="gv">${fmt(lh)}</b></span><span>&times;22 hari &asymp; <b>${fmt(lh*22)}</b>/bln</span><span class="note2">Lembur/hari otomatis dari jam mulai&ndash;berakhir. Pramudi/bln = lembur/hari &times; hari operasi rute.</span></div>`;
+  }else{
+    const total=(+A.biayaPramudi||0)+(+A.tunjangan||0);
+    el.innerHTML=`<div class="pcard"><span>Total Biaya Pramudi: <b>${fmt(total)}</b></span><span>Per hari (&divide;${A.basisHari}): <b class="gv">${fmt(A.basisHari?total/A.basisHari:0)}</b></span><span class="note2">Pramudi/bln = (Biaya Pramudi + Tunjangan) &divide; ${A.basisHari} &times; hari operasi rute</span></div>`;
+  }
+}
+function recompute(){
+  const byH=MODE==='hari',byO=UNIT==='orang';
+  ROUTES.forEach((_,r)=>{const o=document.getElementById('out_'+r);if(o)o.innerHTML=routeOut(r);
+    const c=compute(ROUTES[r],A,INC),s=scalers(ROUTES[r]),kap=s.kap;
+    const headBus=byH?c.hariAfter:c.after, tar=byO?(kap?headBus/kap:0):headBus;
+    const t=document.getElementById('tar_'+r);if(t)t.textContent=fmt(tar)+'/'+(byH?'hari':'bln')+(byO?'/org':'');});
+  const s=renderSummary();
+  document.getElementById('gtlbl').textContent='Grand Total /'+s.time+' (kontrak)';
+  document.getElementById('gtval').textContent=fmt(s.gk);
+  document.getElementById('gtmeta').textContent=ROUTES.length+' rute \u00b7 '+s.gbus+' bus \u00b7 stlh pajak';
+}
+const routesEl=document.getElementById('routes');
+routesEl.addEventListener('input',e=>{
+  const t=e.target,r=t.dataset.r; if(r===undefined)return; const RI=+r;
+  const v=t.classList.contains('n')?num(t.value):t.value;
+  if(t.dataset.kind==='route') ROUTES[RI][t.dataset.field]=v;
+  else if(t.dataset.kind==='leg') ROUTES[RI].legs[+t.dataset.leg][t.dataset.field]=v;
+  if(t.dataset.field==='name'){const el=routesEl.querySelectorAll('.route')[RI].querySelector('.rname');if(el)el.textContent=ROUTES[RI].name||'(tanpa nama)';}
+  if(t.dataset.field==='bus'||t.dataset.field==='hari'){const el=routesEl.querySelectorAll('.route')[RI].querySelector('.meta');if(el)el.innerHTML=ROUTES[RI].bus+' bus &middot; '+ROUTES[RI].hari+' hari';}
+  recompute();
+});
+routesEl.addEventListener('change',e=>{const t=e.target;if(t.tagName==='SELECT'&&t.dataset.kind==='leg'){ROUTES[+t.dataset.r].legs[+t.dataset.leg].jenis=t.value;recompute();}});
+routesEl.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!b.dataset.action)return;const r=+b.dataset.r;
+  if(b.dataset.action==='addleg'){ROUTES[r].legs.push({segmen:'',jenis:'Produksi',km:0,waktu:0,tol:0,freq:1});renderRoutes();recompute();}
+  else if(b.dataset.action==='delleg'){ROUTES[r].legs.splice(+b.dataset.leg,1);renderRoutes();recompute();}
+  else if(b.dataset.action==='delroute'){ROUTES.splice(r,1);renderRoutes();recompute();}});
+let dragRow=null,dragTbody=null,dragR=null;
+function onDragMove(e){if(!dragRow)return;const y=e.clientY;const sibs=[...dragTbody.querySelectorAll('tr')].filter(t=>t!==dragRow);let ref=null;for(const t of sibs){const rc=t.getBoundingClientRect();if(y<rc.top+rc.height/2){ref=t;break;}}if(ref){if(ref!==dragRow.nextSibling)dragTbody.insertBefore(dragRow,ref);}else dragTbody.appendChild(dragRow);}
+function onDragUp(){document.removeEventListener('pointermove',onDragMove);if(!dragRow)return;const order=[...dragTbody.querySelectorAll('tr')].map(t=>+t.dataset.leg);const old=ROUTES[dragR].legs;const changed=order.some((v,i)=>v!==i);if(changed)ROUTES[dragR].legs=order.map(i=>old[i]);dragRow.classList.remove('dragging');dragRow=dragTbody=dragR=null;if(changed){renderRoutes();recompute();}}
+routesEl.addEventListener('pointerdown',e=>{const g=e.target.closest('td.grip');if(!g)return;const tr=g.closest('tr');if(!tr)return;dragRow=tr;dragTbody=tr.closest('tbody');const rEl=tr.querySelector('[data-r]');dragR=rEl?+rEl.dataset.r:0;tr.classList.add('dragging');try{g.setPointerCapture(e.pointerId);}catch(_){}e.preventDefault();document.addEventListener('pointermove',onDragMove);document.addEventListener('pointerup',onDragUp,{once:true});});
+document.getElementById('addRoute').addEventListener('click',()=>{
+  ROUTES.push({name:'Rute Baru',bus:1,hari:22,margin:10,legs:[{segmen:'Depo \u2192 Titik Awal',jenis:'Kosong',km:0,waktu:0,tol:0,freq:1}]});
+  renderRoutes();recompute();});
+const setEl=document.getElementById('settings');
+setEl.addEventListener('input',e=>{const t=e.target;if(t.dataset.a){A[t.dataset.a]=(t.type==='time')?t.value:num(t.value);updatePramOut();recompute();}});
+setEl.addEventListener('change',e=>{const t=e.target;if(t.dataset.inc){INC[t.dataset.inc]=t.checked;recompute();}});
+document.getElementById('csv').addEventListener('click',()=>{
+  const head=['Rute','Bus','Hari','Margin%','Total Biaya','Tarif/bln sblm pajak','PPN','Tarif/bln stlh pajak','Tarif/hari','Per orang/bln','Total armada/bln'];
+  let rows=[head];
+  ROUTES.forEach(rt=>{const c=compute(rt,A,INC);rows.push([rt.name,rt.bus,rt.hari,rt.margin,Math.round(c.total),Math.round(c.before),Math.round(c.ppn),Math.round(c.after),Math.round(c.hariAfter),Math.round(c.perOrang),Math.round(c.armadaAfter)]);});
+  const csv=rows.map(r=>r.map(x=>`"${x}"`).join(',')).join('\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Royaltrans_RateCard_Bid.csv';a.click();});
+document.getElementById('xlsx').addEventListener('click',()=>{
+  const now=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+  const meta='Metode pramudi: '+A.pramudiMode+'  |  Penyusutan: '+(INC.peny?'ON (termasuk)':'OFF (referensi)')+'  |  PPN 11%  |  Dibuat: '+now;
+  const H=l=>({v:l,s:3}),T=v=>({v:v,s:4}),N=v=>({v:Math.round(v||0),s:5}),I=v=>({v:v,s:6}),GT=v=>({v:v,s:7}),GN=v=>({v:Math.round(v||0),s:8});
+  const head1=['Rute','Bus','Hari','Margin %','Total Biaya/bln','Tarif/bln sblm pajak','PPN 11%','Tarif/bln stlh pajak','Tarif/hari (bulat)','Per orang/bln','Total armada/bln'];
+  const rows1=[[{v:'Royaltrans Shuttle \u2014 Rate Card Bid',s:1}],[{v:meta,s:2}],[],head1.map(H)];
+  let sb=0,stot=0,sarm=0;
+  ROUTES.forEach(rt=>{const c=compute(rt,A,INC);sb+=(+rt.bus||0);stot+=c.total;sarm+=c.armadaAfter;rows1.push([T(rt.name||'-'),I(+rt.bus||0),I(+rt.hari||0),I((+rt.margin||0)+'%'),N(c.total),N(c.before),N(c.ppn),N(c.after),N(c.hariAfter),N(c.perOrang),N(c.armadaAfter)]);});
+  rows1.push([GT('TOTAL ('+ROUTES.length+' rute)'),GT(sb),GT(''),GT(''),GN(stot),GT(''),GT(''),GT(''),GT(''),GT(''),GN(sarm)]);
+  const s1={name:'Ringkasan Bid',rows:rows1,cols:[26,6,6,9,16,17,14,17,15,15,16],merges:['A1:K1','A2:K2'],freeze:4};
+  const names=ROUTES.map(rt=>rt.name||'-');const lastC=colName(1+ROUTES.length);
+  const comps=[['BBM','bbm'],['Tol','tol'],['Service Rutin','srv'],['Pramudi','prm'],['TKO','tko'],['Branding','brand'],['Cuci Bus','cuci'],['Perizinan','izin'],['Penyusutan','peny']];
+  const cdata=ROUTES.map(rt=>compute(rt,A,INC));
+  const rows2=[[{v:'Rincian Biaya per Bus / Bulan',s:1}],[{v:meta,s:2}],[],[H('Komponen (per bus / bln)')].concat(names.map(H))];
+  comps.forEach(([lab,key])=>{rows2.push([T(lab)].concat(cdata.map(c=>N(c[key]))));});
+  rows2.push([GT('TOTAL BIAYA / bln')].concat(cdata.map(c=>GN(c.total))));
+  rows2.push([T('Laba / Buffer (margin)')].concat(cdata.map(c=>N(c.laba))));
+  rows2.push([T('Tarif/bln sblm pajak')].concat(cdata.map(c=>N(c.before))));
+  rows2.push([T('PPN 11%')].concat(cdata.map(c=>N(c.ppn))));
+  rows2.push([GT('Tarif/bln stlh pajak')].concat(cdata.map(c=>GN(c.after))));
+  rows2.push([T('Tarif/hari (bulat \u2191100rb)')].concat(cdata.map(c=>N(c.hariAfter))));
+  rows2.push([T('Per orang/bln (\u00f7'+(+A.kapasitas||0)+')')].concat(cdata.map(c=>N(c.perOrang))));
+  const s2={name:'Rincian Biaya',rows:rows2,cols:[24].concat(names.map(()=>16)),merges:['A1:'+lastC+'1','A2:'+lastC+'2'],freeze:4};
+  const blob=new Blob([xlsxBytes([s1,s2])],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Royaltrans_RateCard_Bid.xlsx';a.click();
+});
+document.getElementById('print').addEventListener('click',()=>{document.querySelectorAll('details').forEach(d=>d.open=true);setTimeout(()=>window.print(),80);});
+function renderSettings(){
+  const labels={solar:'Solar (Rp/L)',eff:'Efisiensi (km/L)',srvKm:'Service (Rp/km)',tkoP:'TKO Jam Produksi (Rp/jam)',tkoK:'TKO Jam Kosong (Rp/jam)',f1:'Faktor TKO 1',f2:'Faktor TKO 2',brandYr:'Branding (Rp/thn)',cuciDay:'Cuci (Rp/hari)',izinYr:'Perizinan (Rp/thn)',ppn:'PPN (desimal, 0.11)',kapasitas:'Kapasitas (kursi)',penyusutan:'Penyusutan (Rp/bln)'};
+  let g='';for(const k in labels){g+=`<label>${labels[k]}<input type="number" step="any" class="n" data-a="${k}" value="${A[k]}"></label>`;}
+  document.getElementById('consts').innerHTML=g;
+  const inl={bbm:'BBM',tol:'Tol',srv:'Service Rutin',prm:'Pramudi',tko:'TKO',brand:'Branding',cuci:'Cuci Bus',izin:'Perizinan',peny:'Penyusutan'};
+  let t='';for(const k in inl){t+=`<label class="chk"><input type="checkbox" data-inc="${k}" ${INC[k]?'checked':''}> ${inl[k]}</label>`;}
+  document.getElementById('toggles').innerHTML=t;
+  const pbiasa={biayaPramudi:'Biaya Pramudi /bln',tunjangan:'Tunjangan /bln',basisHari:'Basis hari (÷)'};
+  const plembur={jamMulai:'Jam mulai',jamBerakhir:'Jam berakhir',istirahat:'Istirahat (jam)',upahJam:'Upah lembur/jam',pk1:'Pengkali jam 1-7',pk2:'Pengkali jam ke-8',pk3:'Pengkali jam ke-9+'};
+  let gb='';for(const k in pbiasa){gb+=`<label>${pbiasa[k]}<input type="number" step="any" class="n" data-a="${k}" value="${A[k]}"></label>`;}
+  document.getElementById('biasaGrid').innerHTML=gb;
+  let gl='';for(const k in plembur){const tm=(k==='jamMulai'||k==='jamBerakhir');gl+=`<label>${plembur[k]}<input type="${tm?'time':'number'}" ${tm?'':'step="any" '}class="${tm?'':'n'}" data-a="${k}" value="${A[k]}"></label>`;}
+  document.getElementById('lemburGrid').innerHTML=gl;
+  document.getElementById('biasaWrap').style.display=A.pramudiMode==='biasa'?'':'none';
+  document.getElementById('lemburWrap').style.display=A.pramudiMode==='lembur'?'':'none';
+  document.querySelectorAll('.pmb').forEach(x=>x.classList.toggle('active',x.dataset.pm===A.pramudiMode));
+  updatePramOut();}
+document.querySelectorAll('.modeb').forEach(b=>b.addEventListener('click',()=>{MODE=b.dataset.mode;document.querySelectorAll('.modeb').forEach(x=>x.classList.toggle('active',x===b));recompute();}));
+document.querySelectorAll('.unitb').forEach(b=>b.addEventListener('click',()=>{UNIT=b.dataset.unit;document.querySelectorAll('.unitb').forEach(x=>x.classList.toggle('active',x===b));recompute();}));
+document.querySelectorAll('.pmb').forEach(b=>b.addEventListener('click',()=>{A.pramudiMode=b.dataset.pm;document.querySelectorAll('.pmb').forEach(x=>x.classList.toggle('active',x===b));document.getElementById('biasaWrap').style.display=A.pramudiMode==='biasa'?'':'none';document.getElementById('lemburWrap').style.display=A.pramudiMode==='lembur'?'':'none';updatePramOut();recompute();}));
+document.querySelectorAll('.seg2[data-shift]').forEach(b=>b.addEventListener('click',()=>{const p={full:['04:00','18:00',3],pagi:['05:00','12:00',0],sore:['14:00','19:00',0]}[b.dataset.shift];A.jamMulai=p[0];A.jamBerakhir=p[1];A.istirahat=p[2];['jamMulai','jamBerakhir','istirahat'].forEach((k,i)=>{const el=document.querySelector('[data-a="'+k+'"]');if(el)el.value=p[i];});updatePramOut();recompute();}));
+const pick={mode:'hari',unit:'bus'};
+document.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{pick[b.dataset.q]=b.dataset.v;document.querySelectorAll('.opt[data-q="'+b.dataset.q+'"]').forEach(x=>x.classList.toggle('active',x===b));}));
+document.getElementById('startBtn').addEventListener('click',()=>{MODE=pick.mode;UNIT=pick.unit;document.querySelectorAll('.modeb').forEach(x=>x.classList.toggle('active',x.dataset.mode===MODE));document.querySelectorAll('.unitb').forEach(x=>x.classList.toggle('active',x.dataset.unit===UNIT));document.getElementById('setup').style.display='none';recompute();});
+renderSettings();renderRoutes();recompute();
+</script></body></html>
